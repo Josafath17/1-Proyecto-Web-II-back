@@ -69,8 +69,8 @@ const userGet = (req, res) => {
   } else {
 
     User.find()
-      .then(teachers => {
-        res.json(teachers);
+      .then(users => {
+        res.json(users);
       })
       .catch(err => {
         res.status(422);

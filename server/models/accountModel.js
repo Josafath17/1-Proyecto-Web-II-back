@@ -5,8 +5,10 @@ const account = new Schema({
   username: { type: String },
   pin: { type: Number },
   firstName: { type: String },
-  lastName: { type: String },
-  
+  lastName: { type: String }, 
+  birth_date: { type: String },
+
+
   user: {
     type: mongoose.ObjectId,
     ref: 'User'
@@ -19,4 +21,4 @@ const account = new Schema({
 
 });
 
-module.exports = mongoose.model('accounts', account);
+module.exports = mongoose.model('Account', account);
