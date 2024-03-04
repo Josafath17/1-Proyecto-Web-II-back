@@ -7,4 +7,4 @@ const video = new Schema({
   lastName: { type: String }
 });
 
-module.exports = mongoose.model('students', video);
+module.exports = mongoose.model('Video', video);

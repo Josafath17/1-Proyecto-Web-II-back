@@ -1,4 +1,4 @@
-const Video = require("../models/accountModel");
+const Video = require("../models/videoModel");
 const Playlist = require("../models/userModel");
 
 /**
@@ -7,7 +7,7 @@ const Playlist = require("../models/userModel");
  * @param {*} req
  * @param {*} res
  */
-const AccountPost = (req, res) => {
+const videoPost = (req, res) => {
   var video = new Video();
 
   video.username = req.body.username;
@@ -44,7 +44,7 @@ const AccountPost = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-const accountGet = (req, res) => {
+const videoGet = (req, res) => {
   // if an specific video is required
   if (req.query && req.query.id) {
     video.findById(req.query.id, function (err, video) {
@@ -56,13 +56,13 @@ const accountGet = (req, res) => {
       res.json(video);
     });
   } else {
-    // get all accounts
-    Video.find(function (err, accounts) {
+    // get all videos
+    Video.find(function (err, videos) {
       if (err) {
         res.status(422);
         res.json({ "error": err });
       }
-      res.json(accounts);
+      res.json(videos);
     });
 
   }
@@ -74,7 +74,7 @@ const accountGet = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-const accountDelete = (req, res) => {
+const videoDelete = (req, res) => {
   // if an specific video is required
   if (req.query && req.query.id) {
     Video.findById(req.query.id, function (err, video) {
@@ -108,7 +108,7 @@ const accountDelete = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-const accountPatch = (req, res) => {
+const videoPatch = (req, res) => {
   // get video by id
   if (req.query && req.query.id) {
     Video.findById(req.query.id, function (err, video) {
@@ -145,8 +145,8 @@ const accountPatch = (req, res) => {
 };
 
 module.exports = {
-  accountGet,
-  accountPost,
-  accountPatch,
-  accountDelete
+  videoGet,
+  videoPost,
+  videoPatch,
+  videoDelete
 }

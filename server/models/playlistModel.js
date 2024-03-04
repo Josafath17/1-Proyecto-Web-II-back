@@ -7,4 +7,4 @@ const playlist = new Schema({
   lastName: { type: String }
 });
 
-module.exports = mongoose.model('students', playlist);
+module.exports = mongoose.model('Playlist', playlist);

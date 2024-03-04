@@ -7,7 +7,7 @@ const User = require("../models/userModel");
  * @param {*} req
  * @param {*} res
  */
-const AccountPost = (req, res) => {
+const accountPost = (req, res) => {
   var account = new Account();
 
   account.username = req.body.username;
@@ -47,7 +47,7 @@ const AccountPost = (req, res) => {
 const accountGet = (req, res) => {
   // if an specific account is required
   if (req.query && req.query.id) {
-    account.findById(req.query.id, function (err, account) {
+    AccountPostccount.findById(req.query.id, function (err, account) {
       if (err) {
         res.status(404);
         console.log('error while queryting the account', err)
