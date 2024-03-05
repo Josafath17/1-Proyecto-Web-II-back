@@ -15,10 +15,11 @@ const accountPost = async (req, res) => {
   account.lastName = req.body.lastName;
   account.pin = req.body.pin;
   account.birth_date = req.body.birth_date;
+  account.user = req.body.user ;
 
 
 
-  if (account.username && account.firstName && account.lastName && account.pin && account.birth_date) {
+  if (account.username && account.firstName && account.lastName && account.pin && account.birth_date &&account.user)  {
     await account.save()
       .then(data => {
         res.status(201); // CREATED

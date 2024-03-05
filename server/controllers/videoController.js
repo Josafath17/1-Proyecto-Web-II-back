@@ -1,5 +1,5 @@
 const Video = require("../models/videoModel");
-const Playlist = require("../models/userModel");
+const Playlist = require("../models/playlistModel");
 
 /**
  * Creates a video
@@ -7,14 +7,16 @@ const Playlist = require("../models/userModel");
  * @param {*} req
  * @param {*} res
  */
-const videoPost = (req, res) => {
+const videoPost = async (req, res) => {
   var video = new Video();
 
-  video.username = req.body.username;
-  video.firstName = req.body.firstName;
-  video.lastName = req.body.lastName;
+  video.name = req.body.name;
+  video.url = req.body.url;
+  video.playlist = req.body.playlist;
+  const playlist = await Playlist.findById(req.body.playlist);
 
-  if (video.username && video.firstName && video.lastName) {
+
+  if (video.name && video.url  && !!playlist) {
     video.save(function (err) {
       if (err) {
         res.status(422);
@@ -25,7 +27,7 @@ const videoPost = (req, res) => {
       }
       res.status(201);//CREATED
       res.header({
-        'location': `http://localhost:3000/api/accounts/?id=${video.id}`
+        'location': `http://localhost:3000/api/videos/?id=${video.id}`
       });
       res.json(video);
     });
@@ -44,17 +46,47 @@ const videoPost = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
+
 const videoGet = (req, res) => {
+  if (req.query) {
+    if (req.query.id) {
+
+     
+
+      Video.findById(req.query.id)
+
+
+        .then(video => {
+          res.status(200);
+          res.json(video);
+        })
+        .catch(err => {
+          res.status(404);
+          res.json({ error: "video doesnt exist" })
+          console.log('error while queryting the video', err)
+
+
+        });
+    }
+
+    else if (req.query.playlistid) {
+      Video.find({playlist:req.query.playlistid})
+        .then(videos => {
+        
+          res.json(videos);
+        })
+        .catch(err => {
+          res.status(422);
+          res.json({ "error": err });
+        });
+    } else {
+      res.status(422);
+      res.json({ "No se encontro el playlistid": err });
+
+    }
+
   // if an specific video is required
-  if (req.query && req.query.id) {
-    video.findById(req.query.id, function (err, video) {
-      if (err) {
-        res.status(404);
-        console.log('error while queryting the video', err)
-        res.json({ error: "video doesnt exist" })
-      }
-      res.json(video);
-    });
+ 
   } else {
     // get all videos
     Video.find(function (err, videos) {
@@ -119,9 +151,8 @@ const videoPatch = (req, res) => {
       }
 
       // update the video object (patch)
-      video.username = req.body.username ? req.body.username : video.username;
-      video.firstName = req.body.firstName? req.body.firstName : video.firstName;
-      video.lastName = req.body.lastName? req.body.lastName : video.lastName;
+      video.name = req.body.name ? req.body.name : video.name;
+      video.url = req.body.url? req.body.url : video.url;
       // update the video object (put)
       // video.title = req.body.title
       // video.detail = req.body.detail

@@ -57,8 +57,8 @@ app.delete("/api/accounts", accountDelete);
 
 app.get("/api/playlists", playlistGet);
 app.post("/api/playlists", playlistPost);
-app.patch("/api/playlists", playlistPatch);
-app.put("/api/playlists", playlistPatch);
+// app.patch("/api/playlists", playlistPatch);
+// app.put("/api/playlists", playlistPatch);
 app.delete("/api/playlists", playlistDelete);
 
 app.get("/api/users", userGet);

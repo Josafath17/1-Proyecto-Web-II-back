@@ -1,33 +1,35 @@
 const Playlist = require("../models/playlistModel");
-const Video = require("../models/userModel");
+const User = require("../models/userModel");
+
 /**
  * Creates a playlist
  *
  * @param {*} req
  * @param {*} res
  */
-const playlistPost = (req, res) => {
-  var playlist = new Playlist();
+const playlistPost = async (req, res) => {
+  const playlist = new Playlist();
+  playlist.user = req.body.user;
 
-  playlist.username = req.body.username;
-  playlist.firstName = req.body.firstName;
-  playlist.lastName = req.body.lastName;
+  const user = await User.findById(req.body.user);
 
-  if (playlist.username && playlist.firstName && playlist.lastName) {
-    playlist.save(function (err) {
-      if (err) {
+  if (!!user) {
+    await playlist.save()
+      .then(data => {
+        res.status(201); // CREATED
+        res.header({
+          'location': `/api/playlist/?id=${data.id}`
+        });
+        res.json(data);
+      })
+      .catch(err => {
         res.status(422);
-        console.log('error while saving the playlist', err)
+        console.log('error while saving the playlists', err);
         res.json({
+          error_code: 1233,
           error: 'There was an error saving the playlist'
         });
-      }
-      res.status(201);//CREATED
-      res.header({
-        'location': `http://localhost:3000/api/playlists/?id=${playlist.id}`
       });
-      res.json(playlist);
-    });
   } else {
     res.status(422);
     console.log('error while saving the playlist')
@@ -43,29 +45,57 @@ const playlistPost = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
+
 const playlistGet = (req, res) => {
+
   // if an specific playlist is required
-  if (req.query && req.query.id) {
-    Playlist.findById(req.query.id, function (err, playlist) {
-      if (err) {
-        res.status(404);
-        console.log('error while queryting the playlist', err)
-        res.json({ error: "playlist doesnt exist" })
-      }
-      res.json(playlist);
-    });
+
+  if (req.query && (req.query.id || req.query.userid)) {
+    if (req.query.id) {
+
+      Playlist.findById(req.query.id)
+
+
+        .then(playlist => {
+          res.status(200);
+          res.json(playlist);
+        })
+        .catch(err => {
+          res.status(404);
+          res.json({ error: "playlist doesnt exist" })
+
+
+        });
+    }
+
+    else if (req.query.userid) {
+      Playlist.find()
+        .then(playlists => {
+          const playlist = playlists.filter(playlist => playlist.user == req.query.userid)
+          res.json(playlist);
+        })
+        .catch(err => {
+          res.status(422);
+          res.json({ "error": err });
+        });
+    } else {
+      res.status(422);
+      res.json({ "error":"No se encontro el userid"});
+
+    }
+
   } else {
     // get all playlists
-    Playlist.find(function (err, playlists) {
-      if (err) {
+    Playlist.find()
+      .then(playlists => {
+        res.json(playlists);
+      })
+      .catch(err => {
         res.status(422);
         res.json({ "error": err });
-      }
-      res.json(playlists);
-    });
-
+      });
   }
-};
+}
 
 /**
  * Delete one playlist
@@ -77,50 +107,57 @@ const playlistDelete = (req, res) => {
   // if an specific playlist is required
   if (req.query && req.query.id) {
     Playlist.findById(req.query.id, function (err, playlist) {
-      if (err) {
+      if (err || !playlist) {
         res.status(500);
         console.log('error while queryting the playlist', err)
         res.json({ error: "playlist doesnt exist" })
+        return;
       }
+
       //if the playlist exists
-      if(playlist) {
-        playlist.remove(function(err){
-          if(err) {
-            res.status(500).json({message: "There was an error deleting the playlist"});
-          }
-          res.status(204).json({});
-        })
-      } else {
-        res.status(404);
-        console.log('error while queryting the playlist', err)
-        res.json({ error: "playlist doesnt exist" })
-      }
+      playlist.deleteOne(function (err) {
+        if (err) {
+          res.status(422);
+          console.log('error while deleting the playlist', err)
+          res.json({
+            error: 'There was an error deleting the playlist'
+          });
+        }
+        res.status(204); //No content
+        res.json({});
+      });
     });
   } else {
-    res.status(404).json({ error: "You must provide a playlist ID" });
+    res.status(404);
+    res.json({ error: "playlist doesnt exist" })
   }
 };
 
-/**
+/* *
  * Updates a playlist
  *
  * @param {*} req
  * @param {*} res
  */
-const playlistPatch = (req, res) => {
+/* const playlistPatch = (req, res) => {
   // get playlist by id
   if (req.query && req.query.id) {
     Playlist.findById(req.query.id, function (err, playlist) {
-      if (err) {
+      if (err || !playlist) {
         res.status(404);
         console.log('error while queryting the playlist', err)
         res.json({ error: "playlist doesnt exist" })
+        return
       }
 
       // update the playlist object (patch)
-     // playlist.username = req.body.username ? req.body.username : playlist.username;
-      //playlist.firstName = req.body.firstName? req.body.firstName : playlist.firstName;
-     // playlist.lastName = req.body.lastName? req.body.lastName : playlist.lastName;
+      playlist.username = req.body.username ? req.body.username : playlist.username;
+      playlist.pin = req.body.pin ? req.body.pin : playlist.pin;
+      playlist.firstName = req.body.firstName ? req.body.firstName : playlist.firstName;
+      playlist.lastName = req.body.lastName ? req.body.lastName : playlist.lastName;
+      playlist.birth_date = req.body.birth_date ? req.body.birth_date : playlist.birth_date;
+
+
       // update the playlist object (put)
       // playlist.title = req.body.title
       // playlist.detail = req.body.detail
@@ -141,11 +178,11 @@ const playlistPatch = (req, res) => {
     res.status(404);
     res.json({ error: "playlist doesnt exist" })
   }
-};
+}; */
 
 module.exports = {
   playlistGet,
   playlistPost,
-  playlistPatch,
+  //playlistPatch,
   playlistDelete
 }
