@@ -7,6 +7,21 @@ const Playlist = require("../models/playlistModel");
  * @param {*} req
  * @param {*} res
  */
+/* function verificadorURL(url) {
+  const urls =
+    /^(?:(?:https?:)?\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  return urls.test(url);
+}
+
+const validadorurl= verificadorURL(req.body.url);
+ */
+/*   if(!validadorurl){
+    res.status(400);
+    res.json({error: "Invalid video URL"});
+    return;
+  } */
+ 
+
 const videoPost = async (req, res) => {
   var video = new Video();
 
@@ -16,7 +31,7 @@ const videoPost = async (req, res) => {
   const playlist = await Playlist.findById(req.body.playlist);
 
 
-  if (video.name && video.url  && !!playlist) {
+  if (video.name && video.url && !!playlist) {
     video.save(function (err) {
       if (err) {
         res.status(422);
@@ -51,10 +66,7 @@ const videoGet = (req, res) => {
   if (req.query) {
     if (req.query.id) {
 
-     
-
       Video.findById(req.query.id)
-
 
         .then(video => {
           res.status(200);
@@ -70,9 +82,9 @@ const videoGet = (req, res) => {
     }
 
     else if (req.query.playlistid) {
-      Video.find({playlist:req.query.playlistid})
+      Video.find({ playlist: req.query.playlistid })
         .then(videos => {
-        
+
           res.json(videos);
         })
         .catch(err => {
@@ -85,8 +97,8 @@ const videoGet = (req, res) => {
 
     }
 
-  // if an specific video is required
- 
+    // if an specific video is required
+
   } else {
     // get all videos
     Video.find(function (err, videos) {
@@ -116,10 +128,10 @@ const videoDelete = (req, res) => {
         res.json({ error: "video doesnt exist" })
       }
       //if the video exists
-      if(video) {
-        video.remove(function(err){
-          if(err) {
-            res.status(500).json({message: "There was an error deleting the video"});
+      if (video) {
+        video.remove(function (err) {
+          if (err) {
+            res.status(500).json({ message: "There was an error deleting the video" });
           }
           res.status(204).json({});
         })
@@ -152,7 +164,7 @@ const videoPatch = (req, res) => {
 
       // update the video object (patch)
       video.name = req.body.name ? req.body.name : video.name;
-      video.url = req.body.url? req.body.url : video.url;
+      video.url = req.body.url ? req.body.url : video.url;
       // update the video object (put)
       // video.title = req.body.title
       // video.detail = req.body.detail

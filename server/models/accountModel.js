@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const account = new Schema({
-  username: { type: String },
-  pin: { type: Number },
   firstName: { type: String },
-  lastName: { type: String }, 
-  birth_date: { type: String },
+  pin: { type: Number }, 
+  age: { type: String },
+  avatar: { type: String },
+
 
 
   user: {

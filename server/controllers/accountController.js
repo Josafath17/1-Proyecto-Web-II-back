@@ -10,16 +10,17 @@ const User = require("../models/userModel");
 const accountPost = async (req, res) => {
   const account = new Account();
 
-  account.username = req.body.username;
+
   account.firstName = req.body.firstName;
-  account.lastName = req.body.lastName;
   account.pin = req.body.pin;
-  account.birth_date = req.body.birth_date;
-  account.user = req.body.user ;
+  account.age = req.body.age;
+  account.avatar = req.body.avatar;
+  account.user = req.body.user;
+  const user = await User.findById(req.body.user);
 
 
 
-  if (account.username && account.firstName && account.lastName && account.pin && account.birth_date &&account.user)  {
+  if (account.firstName && account.pin && account.age && !!user) {
     await account.save()
       .then(data => {
         res.status(201); // CREATED
@@ -53,18 +54,37 @@ const accountPost = async (req, res) => {
  */
 const accountGet = (req, res) => {
   // if an specific account is required
-  if (req.query && req.query.id) {
-    Account.findById(req.query.id)
+  if (req.query && req.query.id || req.query.userid) {
+    if (req.query.id) {
 
-      .then(account => {
-        res.status(200);
-        res.json(account);
-      })
-      .catch(err => {
-        res.status(404);
-        res.json({ error: "account doesnt exist" })
-      });
+      Account.findById(req.query.id)
 
+        .then(account => {
+          res.status(200);
+          res.json(account);
+        })
+        .catch(err => {
+          res.status(404);
+          res.json({ error: "account doesnt exist", err})
+
+        });
+    }
+
+    else if (req.query.userid) {
+      Account.find()
+        .then(accounts => {
+          const account = accounts.filter(account => account.user == req.query.userid)
+          res.json(account);
+        })
+        .catch(err => {
+          res.status(422);
+          res.json({ "error": err });
+        });
+    } else {
+      res.status(422);
+      res.json({ "error": "No se encontro el userid" });
+
+    }
 
   } else {
     // get all accounts
@@ -133,11 +153,10 @@ const accountPatch = (req, res) => {
       }
 
       // update the account object (patch)
-      account.username = req.body.username ? req.body.username : account.username;
+
       account.pin = req.body.pin ? req.body.pin : account.pin;
       account.firstName = req.body.firstName ? req.body.firstName : account.firstName;
-      account.lastName = req.body.lastName ? req.body.lastName : account.lastName;
-      account.birth_date = req.body.birth_date ? req.body.birth_date : account.birth_date;
+      account.age = req.body.age ? req.body.age : account.age;
 
 
       // update the account object (put)
