@@ -10,6 +10,8 @@ const User = require("../models/userModel");
 const userPost = async (req, res) => {
   const user = new User();
 
+
+
   user.username = req.body.username;
   user.password = req.body.password;
   user.pin = req.body.pin;
@@ -21,7 +23,58 @@ const userPost = async (req, res) => {
 
 
 
+
+
+
+
+
+
   if (user.username && user.password && user.pin && user.country && user.birth_date && user.firstName && user.lastName) {
+
+    //validar Email /username
+    const validEmail = async (email) => {
+      const validEmail = await User.findOne({ username: email });
+      if (validEmail) {
+        return { valid: false, error: "Invalid email" };
+      }
+
+      const emailFormat = /^\S+@\S+\.\S+$/;
+      if (!emailFormat.test(email)) {
+        return { valid: false, error: "Invalid email format" };
+      }
+
+      return { valid: true };
+    };
+
+    const validationResult = await validEmail(user.username);
+    if (!validationResult.valid) {
+      res.json({ error: validationResult.error });
+      return;
+    }
+
+    // Valida la edad del usuario
+    const today = new Date();
+    const birthdate = new Date(user.birth_date);
+    const operador =
+
+      today.getMonth() < birthdate.getMonth() ||
+      (today.getMonth() === birthdate.getMonth() &&
+        today.getDate() < birthdate.getDate());
+    const age =
+      18 <=
+      today.getFullYear() - birthdate.getFullYear() - (operador ? 1 : 0);
+    if (!age) {
+
+      res.status(422);
+      res.json({ error: "Users must be over 18 years old." });
+      return;
+    }
+
+
+
+
+
+
     await user.save()
       .then(data => {
         res.status(201); // CREATED

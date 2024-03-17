@@ -16,11 +16,19 @@ const accountPost = async (req, res) => {
   account.age = req.body.age;
   account.avatar = req.body.avatar;
   account.user = req.body.user;
+
   const user = await User.findById(req.body.user);
 
-
-
+  //validador de ping
   if (account.firstName && account.pin && account.age && !!user) {
+
+    const validadordepin = req.body.pin.length == 6;
+    if (!validadordepin) {
+      res.json({ error: "the pin is longer" });
+      return;
+    }
+
+
     await account.save()
       .then(data => {
         res.status(201); // CREATED
@@ -38,6 +46,7 @@ const accountPost = async (req, res) => {
         });
       });
   } else {
+
     res.status(422);
     console.log('error while saving the account')
     res.json({
@@ -65,7 +74,7 @@ const accountGet = (req, res) => {
         })
         .catch(err => {
           res.status(404);
-          res.json({ error: "account doesnt exist", err})
+          res.json({ error: "account doesnt exist", err })
 
         });
     }
