@@ -9,6 +9,7 @@ const user = new Schema({
   lastName: { type: String },
   country: { type: String },
   birth_date: { type: String }
+  
  
 });
 

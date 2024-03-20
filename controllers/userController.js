@@ -20,15 +20,7 @@ const userPost = async (req, res) => {
   user.country = req.body.country;
   user.birth_date = req.body.birth_date;
 
-
-
-
-
-
-
-
-
-
+  
   if (user.username && user.password && user.pin && user.country && user.birth_date && user.firstName && user.lastName) {
 
     //validar Email /username
@@ -55,6 +47,7 @@ const userPost = async (req, res) => {
     // Valida la edad del usuario
     const today = new Date();
     const birthdate = new Date(user.birth_date);
+    
     const operador =
 
       today.getMonth() < birthdate.getMonth() ||
@@ -69,9 +62,7 @@ const userPost = async (req, res) => {
       res.json({ error: "Users must be over 18 years old." });
       return;
     }
-
-
-
+    
 
 
 
@@ -80,7 +71,9 @@ const userPost = async (req, res) => {
         res.status(201); // CREATED
         res.header({
           'location': `/api/users/?id=${data.id}`
+        
         });
+       
         res.json(data);
       })
       .catch(err => {

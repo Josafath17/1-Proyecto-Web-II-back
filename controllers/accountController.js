@@ -22,7 +22,7 @@ const accountPost = async (req, res) => {
   //validador de ping
   if (account.firstName && account.pin && account.age && !!user) {
 
-    const validadordepin = req.body.pin.length == 6;
+    const validadordepin = req.body.pin.toString().length == 6;
     if (!validadordepin) {
       res.json({ error: "the pin is longer" });
       return;
@@ -166,6 +166,7 @@ const accountPatch = (req, res) => {
       account.pin = req.body.pin ? req.body.pin : account.pin;
       account.firstName = req.body.firstName ? req.body.firstName : account.firstName;
       account.age = req.body.age ? req.body.age : account.age;
+      
 
 
       // update the account object (put)
